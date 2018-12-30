@@ -974,3 +974,40 @@
   (testing "Frequency of case one"
     (let [input case-one-input]
       (is (= 408 (calibrate input))))))
+
+(defn in?
+  "true if coll contains elm"
+  [coll elm]
+  (some #(= elm %) coll))
+
+(defn find-duplicate-frequency [original-inputs]
+  (loop [frequencies [0]
+         current-frequency 0
+         inputs original-inputs]
+    (let [next-frequency (+ current-frequency (read-string (first inputs)))]
+      (if (in? frequencies next-frequency)
+        next-frequency
+        (if (empty? (rest inputs))
+          (recur (into [next-frequency] frequencies) next-frequency original-inputs)
+          (recur (into [next-frequency] frequencies) next-frequency (rest inputs)))))))
+
+
+(deftest find-duplicate-frequency-sample
+  (testing "Find duplicate frequency sample"
+    (let [input ["+1" "-2" "+3" "+1" "+1" "-2" "+1"]]
+      (is (= 2 (find-duplicate-frequency input))))))
+
+(deftest find-duplicate-frequency-sample-two
+  (testing "Find duplicate frequency sample"
+    (let [input ["+1" "-1"]]
+      (is (= 0 (find-duplicate-frequency input))))))
+
+(deftest find-duplicate-frequency-sample-three
+  (testing "Find duplicate frequency sample"
+    (let [input ["+3" "+3" "+4" "-2" "-4"]]
+      (is (= 10 (find-duplicate-frequency input))))))
+
+(deftest case-one
+  (testing "Duplicate frequency of case two"
+    (let [input case-one-input]
+      (is (= 55250 (find-duplicate-frequency input))))))
