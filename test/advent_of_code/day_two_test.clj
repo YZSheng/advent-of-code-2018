@@ -1,5 +1,6 @@
 (ns advent-of-code.day-two-test
-  (:require [clojure.test :refer :all]))
+  (:require [clojure.test :refer :all]
+            [clojure.data :refer :all]))
 
 (def sample-input
   ["abcdef" "bababc" "abbcde" "abcccd" "aabcdd" "abcdee" "ababab"])
@@ -294,3 +295,13 @@
     (is (= 12 (get-checksum sample-input))))
   (testing "checksum of case one"
     (is (= 6696 (get-checksum case-one-input)))))
+
+(defn check-difference-pair [a b]
+  (let [difference (diff (seq (char-array a)) (seq (char-array b)))
+        non-nil-diff (map #(remove nil? %) difference)]
+    (and (= 1 (count (first non-nil-diff))) (= 1 (count (second non-nil-diff))))))
+
+(deftest find-difference
+  (testing "finds difference pair of strings"
+    (is (check-difference-pair "fghij" "fguij"))
+    (is (not (check-difference-pair "abcde" "axcye")))))
