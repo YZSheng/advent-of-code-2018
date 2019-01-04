@@ -13,16 +13,19 @@
     (let [positions [[3 1] [3 2] [4 1] [4 2]]]
       (is (= positions (get-positions "#1 @ 3,1: 2x2"))))))
 
-(defn compose-grid [grid positions]
+(defn update-grid [grid positions]
   (reduce #(assoc %1 %2 (inc (get %1 %2 0))) grid positions))
 
+(defn get-grid [claims]
+  (let [positions-coll (map get-positions claims)]
+    (reduce update-grid {} positions-coll)))
+
 (defn find-overlap [claims]
-  (let [positions-coll (map get-positions claims)
-        grid (reduce compose-grid {} positions-coll)]
-    (->> grid
-         vals
-         (filter #(> % 1))
-         count)))
+  (->> claims
+       get-grid
+       vals
+       (filter #(> % 1))
+       count))
 
 (def input ["#1 @ 258,327: 19x22"
             "#2 @ 553,11: 13x13"
@@ -1344,3 +1347,18 @@
       (is (= 12 (find-overlap claims)))))
   (testing "actual input"
     (is (= 111485 (find-overlap input)))))
+
+(defn check-non-overlap [grid claim]
+  (let [positions (get-positions claim)]
+    (every? #(= 1 (get grid %)) positions)))
+
+(defn find-non-overlap [claims]
+  (let [grid (get-grid claims)]
+    (some #(when (check-non-overlap grid %) %) claims)))
+
+(deftest find-non-overlap-claim
+  (testing "sample data"
+    (let [claims ["#1 @ 1,3: 4x4" "#2 @ 3,1: 4x4" "#3 @ 5,5: 2x2"]]
+      (is (= "#3 @ 5,5: 2x2" (find-non-overlap claims)))))
+  (testing "actual data"
+     (is (= "#113 @ 632,645: 27x19" (find-non-overlap input)))))
